@@ -57,8 +57,16 @@ export class TasksService {
   }
 
   delete(id: string) {
-    this.tasks = this.tasks.filter((task) => task.id !== Number(id));
-    return { deleted: true };
+    const taskIndex = this.tasks.findIndex((task) => task.id === Number(id));
+
+    if (taskIndex < 0)
+      throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
+
+    //this.tasks = this.tasks.filter((task) => task.id !== Number(id));
+
+    this.tasks.splice(taskIndex, 1);
+
+    return { deleted: 'Tarefa esxluida com sucesso' };
   }
 
   update(id: string, body: any) {
