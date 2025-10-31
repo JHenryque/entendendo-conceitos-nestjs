@@ -49,4 +49,21 @@ export class TasksService {
     this.tasks = this.tasks.filter((task) => task.id !== Number(id));
     return { deleted: true };
   }
+
+  update(id: string, body: any) {
+    const taskIndex = this.tasks.findIndex((task) => task.id === Number(id));
+
+    if (taskIndex > 0) {
+      const taskUpdated = this.tasks[taskIndex];
+      console.log(taskUpdated);
+
+      this.tasks[taskIndex] = {
+        ...taskUpdated,
+        ...body,
+      };
+      //console.log(this.tasks);
+    }
+
+    return 'Task updated successfully';
+  }
 }
