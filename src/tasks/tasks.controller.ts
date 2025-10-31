@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  Query,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 
@@ -15,13 +14,12 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
-  findAllTasks(@Query('limit') limit: string) {
-    console.log(limit);
+  findAllTasks() {
     return this.tasksService.findAll();
   }
 
   @Get(':id')
-  findTaskById(@Param('id') id: number) {
+  findTaskById(@Param('id') id: string) {
     console.log(id);
     return this.tasksService.findById(id);
   }
@@ -39,8 +37,7 @@ export class TasksController {
   }
 
   @Delete(':id')
-  deleteTask(@Param('id') id: number) {
-    console.log('ID:', id);
-    return `Deletando a task #${id}`;
+  deleteTask(@Param('id') id: string) {
+    return this.tasksService.delete(id);
   }
 }
