@@ -14,4 +14,9 @@ export class TesksController {
   getAllTesks2() {
     return this.tesksService.getAllTesks2();
   }
+
+  @Get('/service')
+  getService() {
+    return this.tesksService.getService();
+  }
 }
