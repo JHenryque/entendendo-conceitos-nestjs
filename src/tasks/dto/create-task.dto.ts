@@ -2,7 +2,7 @@ import { IsBoolean, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class CreateTaskDto {
   @IsString({ message: 'Name must be a string' })
-  @MinLength(5, { message: 'Name must be at least 53 characters long' })
+  @MinLength(5, { message: 'Name must be at least 5 characters long' })
   @IsNotEmpty()
   //@MaxLength(50, { message: 'Name must be at most 50 characters long' })
   readonly name: string;
