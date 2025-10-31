@@ -1,10 +1,7 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { Task } from 'src/entities/tasks.entity';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Task } from 'src/tasks/entities/tasks.entity';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Injectable()
 export class TasksService {
@@ -15,8 +12,6 @@ export class TasksService {
       cargo: 'Developer',
       description: 'This is the first task',
       isCompleted: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     },
     {
       id: 2,
@@ -24,8 +19,6 @@ export class TasksService {
       cargo: 'Developer',
       description: 'This is the second task',
       isCompleted: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     },
   ];
   findAll() {
@@ -41,15 +34,16 @@ export class TasksService {
     //throw new NotFoundException('Task not found');
   }
 
-  createTask(body: any) {
+  createTask(createTaskDto: CreateTaskDto) {
     const newId = this.tasks.length > 0 ? this.tasks.length + 1 : 1;
 
-    if (newId)
+    if (!newId)
       throw new HttpException('Essa tarefa não existe', HttpStatus.BAD_REQUEST);
 
     const newTask: Task = {
       id: newId,
-      ...body,
+      ...createTaskDto,
+      isCompleted: true,
     };
 
     this.tasks.push(newTask);
@@ -69,7 +63,7 @@ export class TasksService {
     return { deleted: 'Tarefa esxluida com sucesso' };
   }
 
-  update(id: string, body: any) {
+  update(id: string, updateTaskDto: UpdateTaskDto) {
     const taskIndex = this.tasks.findIndex((task) => task.id === Number(id));
 
     if (taskIndex < 0)
@@ -81,7 +75,7 @@ export class TasksService {
 
       this.tasks[taskIndex] = {
         ...taskUpdated,
-        ...body,
+        ...updateTaskDto,
       };
       //console.log(this.tasks);
     }
