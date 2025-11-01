@@ -5,9 +5,10 @@ import { UsersModule } from './app/users/users.module';
 import { TasksController } from './tasks/tasks.controller';
 import { TasksModule } from './tasks/tasks.module';
 import { RestestModule } from './restest/restest.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [UsersModule, TasksModule, RestestModule],
+  imports: [UsersModule, TasksModule, RestestModule, PrismaModule],
   controllers: [AppController, TasksController],
   providers: [AppService],
 })

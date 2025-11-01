@@ -2,9 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Task } from 'src/tasks/entities/tasks.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Injectable()
 export class TasksService {
+  constructor(private readonly prisma: PrismaModule) {}
   private tasks: Task[] = [
     {
       id: 1,
@@ -21,8 +23,8 @@ export class TasksService {
       isCompleted: false,
     },
   ];
-  findAll() {
-    return this.tasks;
+  async findAll() {
+    return await this.prisma.task.findMany();
   }
 
   findById(id: string) {
