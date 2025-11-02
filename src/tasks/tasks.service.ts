@@ -2,11 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Task } from 'src/tasks/entities/tasks.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TasksService {
-  constructor(private readonly prisma: PrismaModule) {}
+  constructor(private readonly prisma: PrismaService) {}
   private tasks: Task[] = [
     {
       id: 1,
@@ -24,13 +24,19 @@ export class TasksService {
     },
   ];
   async findAll() {
-    return await this.prisma.task.findMany();
+    const allTasks = await this.prisma.task.findMany();
+    console.log(allTasks);
+    return allTasks;
   }
 
-  findById(id: string) {
-    const task = this.tasks.find((task) => task.id === Number(id));
+  async findById(id: string) {
+    //const task = this.tasks.find((task) => task.id === Number(id));
 
-    if (task) return task;
+    const task = await this.prisma.task.findFirst({
+      where: { id: Number(id) },
+    });
+
+    if (task?.name) return task;
 
     throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
     //throw new NotFoundException('Task not found');
