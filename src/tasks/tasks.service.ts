@@ -8,22 +8,22 @@ import { PaginationDto } from 'src/common/dto/pagination';
 @Injectable()
 export class TasksService {
   constructor(private readonly prisma: PrismaService) {}
-  private tasks: Task[] = [
-    {
-      id: 1,
-      name: 'First Task',
-      cargo: 'Developer',
-      description: 'This is the first task',
-      isCompleted: false,
-    },
-    {
-      id: 2,
-      name: 'Second Task',
-      cargo: 'Developer',
-      description: 'This is the second task',
-      isCompleted: false,
-    },
-  ];
+  // private tasks: Task[] = [
+  //   {
+  //     id: 1,
+  //     name: 'First Task',
+  //     cargo: 'Developer',
+  //     description: 'This is the first task',
+  //     isCompleted: false,
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'Second Task',
+  //     cargo: 'Developer',
+  //     description: 'This is the second task',
+  //     isCompleted: false,
+  //   },
+  // ];
 
   async findAll(paginationDto: PaginationDto) {
     console.log(paginationDto);
@@ -33,6 +33,7 @@ export class TasksService {
     const allTasks = await this.prisma.task.findMany({
       take: limit,
       skip: offset,
+      orderBy: { createdAt: 'desc' },
     });
 
     return allTasks;
