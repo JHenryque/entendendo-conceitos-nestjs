@@ -67,17 +67,32 @@ export class TasksService {
     return newTask;
   }
 
-  delete(id: string) {
-    const taskIndex = this.tasks.findIndex((task) => task.id === Number(id));
+  async delete(id: string) {
+    // const taskIndex = this.tasks.findIndex((task) => task.id === Number(id));
 
-    if (taskIndex < 0)
-      throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
+    // if (taskIndex < 0)
+    //   throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
 
-    //this.tasks = this.tasks.filter((task) => task.id !== Number(id));
+    // //this.tasks = this.tasks.filter((task) => task.id !== Number(id));
 
-    this.tasks.splice(taskIndex, 1);
+    // this.tasks.splice(taskIndex, 1);
+    try {
+      const findTask = await this.prisma.task.findFirst({
+        where: { id: Number(id) },
+      });
 
-    return { deleted: 'Tarefa esxluida com sucesso' };
+      if (!findTask)
+        throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
+
+      await this.prisma.task.delete({
+        where: { id: findTask.id },
+      });
+
+      return { deleted: 'Tarefa exluida com sucesso' };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Essa tarefa não existe', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto) {
