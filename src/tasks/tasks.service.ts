@@ -23,6 +23,7 @@ export class TasksService {
       isCompleted: false,
     },
   ];
+
   async findAll() {
     const allTasks = await this.prisma.task.findMany();
     console.log(allTasks);
@@ -43,18 +44,26 @@ export class TasksService {
   }
 
   createTask(createTaskDto: CreateTaskDto) {
-    const newId = this.tasks.length > 0 ? this.tasks.length + 1 : 1;
+    //const newId = this.tasks.length > 0 ? this.tasks.length + 1 : 1;
 
-    if (!newId)
-      throw new HttpException('Essa tarefa não existe', HttpStatus.BAD_REQUEST);
+    const newTask = this.prisma.task.create({
+      data: {
+        name: createTaskDto.name,
+        cargo: createTaskDto.cargo,
+        description: createTaskDto.description,
+        isCompleted: false,
+      },
+    });
+    // if (!newId)
+    //   throw new HttpException('Essa tarefa não existe', HttpStatus.BAD_REQUEST);
 
-    const newTask: Task = {
-      id: newId,
-      ...createTaskDto,
-      isCompleted: true,
-    };
+    // const newTask: Task = {
+    //   id: newId,
+    //   ...createTaskDto,
+    //   isCompleted: true,
+    // };
 
-    this.tasks.push(newTask);
+    // this.tasks.push(newTask);
     return newTask;
   }
 
@@ -71,23 +80,35 @@ export class TasksService {
     return { deleted: 'Tarefa esxluida com sucesso' };
   }
 
-  update(id: string, updateTaskDto: UpdateTaskDto) {
-    const taskIndex = this.tasks.findIndex((task) => task.id === Number(id));
+  async update(id: string, updateTaskDto: UpdateTaskDto) {
+    // const taskIndex = this.tasks.findIndex((task) => task.id === Number(id));
 
-    if (taskIndex < 0)
+    // if (taskIndex < 0)
+    //   throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
+
+    // if (taskIndex > 0) {
+    //   const taskUpdated = this.tasks[taskIndex];
+    //   console.log(taskUpdated);
+
+    //   this.tasks[taskIndex] = {
+    //     ...taskUpdated,
+    //     ...updateTaskDto,
+    //   };
+    //   //console.log(this.tasks);
+    // }
+
+    const findTask = await this.prisma.task.findFirst({
+      where: { id: Number(id) },
+    });
+
+    if (!findTask)
       throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
 
-    if (taskIndex > 0) {
-      const taskUpdated = this.tasks[taskIndex];
-      console.log(taskUpdated);
+    const task = await this.prisma.task.update({
+      where: { id: findTask.id },
+      data: updateTaskDto,
+    });
 
-      this.tasks[taskIndex] = {
-        ...taskUpdated,
-        ...updateTaskDto,
-      };
-      //console.log(this.tasks);
-    }
-
-    return 'Task updated successfully';
+    return task;
   }
 }
