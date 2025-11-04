@@ -9,7 +9,7 @@ export class UsersService {
   async findOne(id: number) {
     const user = await this.prisma.user.findFirst({
       where: { id },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, Task: true },
     });
     if (user) return user;
 

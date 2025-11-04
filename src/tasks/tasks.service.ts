@@ -55,25 +55,22 @@ export class TasksService {
   createTask(createTaskDto: CreateTaskDto) {
     //const newId = this.tasks.length > 0 ? this.tasks.length + 1 : 1;
 
-    const newTask = this.prisma.task.create({
-      data: {
-        name: createTaskDto.name,
-        cargo: createTaskDto.cargo,
-        description: createTaskDto.description,
-        isCompleted: false,
-      },
-    });
-    // if (!newId)
-    //   throw new HttpException('Essa tarefa não existe', HttpStatus.BAD_REQUEST);
+    try {
+      const newTask = this.prisma.task.create({
+        data: {
+          name: createTaskDto.name,
+          cargo: createTaskDto.cargo,
+          description: createTaskDto.description,
+          isCompleted: false,
+          userId: createTaskDto.userId,
+        },
+      });
 
-    // const newTask: Task = {
-    //   id: newId,
-    //   ...createTaskDto,
-    //   isCompleted: true,
-    // };
-
-    // this.tasks.push(newTask);
-    return newTask;
+      return newTask;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('falha ao cadastrar', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async delete(id: string) {
