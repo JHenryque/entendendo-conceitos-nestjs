@@ -23,6 +23,10 @@ import { AuthAdminGuard } from './common/guards/admin.guard';
       provide: APP_GUARD,
       useClass: AuthAdminGuard,
     },
+    {
+      provide: 'KEY_TOKEN',
+      useValue: 'Tokem_125',
+    },
   ],
 })
 export class AppModule implements NestModule {
