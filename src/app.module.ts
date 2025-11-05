@@ -13,20 +13,21 @@ import { UsersModule } from './users/users.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthAdminGuard } from './common/guards/admin.guard';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [TasksModule, UsersModule],
+  imports: [ConfigModule.forRoot(), TasksModule, UsersModule],
   controllers: [AppController, TasksController, UsersController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthAdminGuard,
-    },
-    {
-      provide: 'KEY_TOKEN',
-      useValue: 'Tokem_125',
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthAdminGuard,
+    // },
+    // {
+    //   provide: 'KEY_TOKEN',
+    //   useValue: 'Tokem_125',
+    // },
   ],
 })
 export class AppModule implements NestModule {
