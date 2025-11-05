@@ -12,6 +12,7 @@ export class LoggerMiddleware implements NestMiddleware {
       req['user'] = {
         token: authorization,
         name: 'Teste',
+        role: 'admin',
       };
       if (authorization === '123456') {
         console.log('Token válido');
