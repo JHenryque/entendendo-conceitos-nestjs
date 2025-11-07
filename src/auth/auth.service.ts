@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { HashingServiceProtocol } from './hash/hashing.service';
 import jwtConfig from './config/jwt.config';
 import type { ConfigType } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -13,9 +14,8 @@ export class AuthService {
 
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
-  ) {
-    console.log(jwtConfiguration);
-  }
+    private readonly jwtService: JwtService,
+  ) {}
   async authenticate(signInDto: SignInDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: signInDto.email },
@@ -32,11 +32,25 @@ export class AuthService {
     if (!passwordIsValid)
       throw new HttpException('Senha e invalida', HttpStatus.UNAUTHORIZED);
 
+    const token = await this.jwtService.signAsync(
+      {
+        sub: user.id,
+        email: user.email,
+      },
+      {
+        secret: this.jwtConfiguration.secret,
+        expiresIn: this.jwtConfiguration.jwtTtl,
+        audience: this.jwtConfiguration.audience,
+        issuer: this.jwtConfiguration.issuer,
+      },
+    );
+
     console.log('Logado com sucesso');
     return {
       id: user.id,
       name: user.name,
       email: user.email,
+      token: token,
     };
   }
 }
