@@ -15,9 +15,10 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 // import { AuthAdminGuard } from './common/guards/admin.guard';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { TestModule } from './app/test/test.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), TasksModule, UsersModule, AuthModule],
+  imports: [ConfigModule.forRoot(), TasksModule, UsersModule, AuthModule, TestModule],
   controllers: [AppController, TasksController, UsersController],
   providers: [
     AppService,
