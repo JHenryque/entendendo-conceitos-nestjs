@@ -15,7 +15,8 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create.user.dto';
 import { UpdateUserDto } from './dto/update.user.dto';
 import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
-import { REQUEST_TOKEN_PAYLOAD_NAME } from 'src/auth/common/auth.constans';
+import { TokenPayloadParam } from 'src/auth/param/token.param';
+import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
 //mport { REQUEST_TOKEN_PAYLOAD_NAME } from 'src/auth/common/auth.constans';
 
 @Controller('users')
@@ -38,9 +39,9 @@ export class UsersController {
   updateUser(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
-    @Req() req: Request,
+    @TokenPayloadParam() tokenPayload: PayloadTokenDto,
   ) {
-    console.log('ID user:', req[REQUEST_TOKEN_PAYLOAD_NAME]?.sub);
+    console.log('ID user:', tokenPayload);
 
     return this.userService.update(id, updateUserDto);
   }

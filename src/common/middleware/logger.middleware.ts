@@ -14,8 +14,7 @@ export class LoggerMiddleware implements NestMiddleware {
         name: 'Teste',
         role: 'admin',
       };
-      if (authorization === '123456') {
-        console.log('Token válido');
+      if (authorization) {
         return next();
       }
       res.status(401).json({ message: 'Token inválido' });
