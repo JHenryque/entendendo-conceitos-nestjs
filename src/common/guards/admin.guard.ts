@@ -8,10 +8,10 @@ export class AuthAdminGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     // return request.user.role === 'admin';
-    console.log('-------- Guards ---------');
-    console.log(request['user']);
-    console.log('-----------------');
-    if (request['user']?.role === 'admin') return true;
+    // console.log('-------- Guards ---------');
+    // console.log(request['user']);
+    // console.log('-----------------');
+    //if (request['user']?.role === 'admin') return true;
 
     return false;
   }

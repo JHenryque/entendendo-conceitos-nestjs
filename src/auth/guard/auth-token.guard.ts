@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   CanActivate,
   ExecutionContext,
@@ -13,20 +14,52 @@ import { REQUEST_TOKEN_PAYLOAD_NAME } from '../common/auth.constans';
 
 @Injectable()
 export class AuthTokenGuard implements CanActivate {
+  // constructor(
+  //   private readonly jwtService: JwtService,
+
+  //   @Inject(jwtConfig.KEY)
+  //   private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
+  // ) {}
+  // async canActivate(context: ExecutionContext): Promise<boolean> {
+  //   const request: Request = context.switchToHttp().getRequest();
+  //   const token = this.extractTokenHeader(request);
+
+  //   if (!token) throw new UnauthorizedException('Token não encontrado');
+
+  //   try {
+  //     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  //     const payload = await this.jwtService.verifyAsync(
+  //       token,
+  //       this.jwtConfiguration,
+  //     );
+
+  //     request[REQUEST_TOKEN_PAYLOAD_NAME] = payload;
+  //     console.log(payload);
+  //   } catch (error) {
+  //     console.log(error);
+  //     throw new UnauthorizedException('Acesso negado');
+  //   }
+
+  //   return true;
+  // }
+  // ---------------- revisando ---------------->
+
   constructor(
     private readonly jwtService: JwtService,
 
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     const token = this.extractTokenHeader(request);
 
-    if (!token) throw new UnauthorizedException('Token não encontrado');
+    if (!token) {
+      throw new UnauthorizedException('Token não encontrado');
+    }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const payload = await this.jwtService.verifyAsync(
         token,
         this.jwtConfiguration,

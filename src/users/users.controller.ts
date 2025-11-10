@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Body,
   Controller,
@@ -13,8 +14,9 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create.user.dto';
 import { UpdateUserDto } from './dto/update.user.dto';
-import { AuthAdminGuard } from 'src/common/guards/admin.guard';
+import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
 import { REQUEST_TOKEN_PAYLOAD_NAME } from 'src/auth/common/auth.constans';
+//mport { REQUEST_TOKEN_PAYLOAD_NAME } from 'src/auth/common/auth.constans';
 
 @Controller('users')
 export class UsersController {
@@ -31,7 +33,7 @@ export class UsersController {
     return this.userService.create(createUserDto);
   }
 
-  @UseGuards(AuthAdminGuard)
+  @UseGuards(AuthTokenGuard)
   @Patch(':id')
   updateUser(
     @Param('id', ParseIntPipe) id: number,
