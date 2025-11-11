@@ -4,6 +4,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaginationDto } from 'src/common/dto/pagination';
+import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
 
 @Injectable()
 export class TasksService {
@@ -52,7 +53,7 @@ export class TasksService {
     //throw new NotFoundException('Task not found');
   }
 
-  createTask(createTaskDto: CreateTaskDto) {
+  createTask(createTaskDto: CreateTaskDto, tokenPayload: PayloadTokenDto) {
     //const newId = this.tasks.length > 0 ? this.tasks.length + 1 : 1;
 
     try {
@@ -62,7 +63,7 @@ export class TasksService {
           cargo: createTaskDto.cargo,
           description: createTaskDto.description,
           isCompleted: false,
-          userId: createTaskDto.userId,
+          userId: tokenPayload.sub,
         },
       });
 
@@ -73,7 +74,7 @@ export class TasksService {
     }
   }
 
-  async delete(id: string) {
+  async delete(id: string, tokenPayload: PayloadTokenDto) {
     // const taskIndex = this.tasks.findIndex((task) => task.id === Number(id));
 
     // if (taskIndex < 0)
@@ -90,6 +91,9 @@ export class TasksService {
       if (!findTask)
         throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
 
+      if (findTask.userId !== tokenPayload.sub)
+        throw new HttpException('Acesso negado', HttpStatus.BAD_REQUEST);
+
       await this.prisma.task.delete({
         where: { id: findTask.id },
       });
@@ -101,7 +105,11 @@ export class TasksService {
     }
   }
 
-  async update(id: string, updateTaskDto: UpdateTaskDto) {
+  async update(
+    id: string,
+    updateTaskDto: UpdateTaskDto,
+    tokenPayload: PayloadTokenDto,
+  ) {
     // const taskIndex = this.tasks.findIndex((task) => task.id === Number(id));
 
     // if (taskIndex < 0)
@@ -124,6 +132,9 @@ export class TasksService {
 
     if (!findTask)
       throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
+
+    if (findTask.userId !== tokenPayload.sub)
+      throw new HttpException('Acesso negado', HttpStatus.BAD_REQUEST);
 
     const task = await this.prisma.task.update({
       where: { id: findTask.id },

@@ -1,3 +1,4 @@
+import { Optional } from '@nestjs/common';
 import {
   IsBoolean,
   IsNotEmpty,
@@ -23,7 +24,6 @@ export class CreateTaskDto {
   @IsBoolean()
   readonly isCompleted: boolean;
 
-  @IsNumber()
-  @IsNotEmpty()
+  @Optional()
   readonly userId: number;
 }
