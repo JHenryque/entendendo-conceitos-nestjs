@@ -18,11 +18,14 @@ export class AuthService {
   ) {}
   async authenticate(signInDto: SignInDto) {
     const user = await this.prisma.user.findUnique({
-      where: { email: signInDto.email },
+      where: { email: signInDto.email, active: true },
     });
 
     if (!user)
-      throw new HttpException('Email e invalido', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        'Email e invalido ou falha ao autenticar usuario',
+        HttpStatus.UNAUTHORIZED,
+      );
 
     const passwordIsValid = await this.decrypt.compare(
       signInDto.password,
