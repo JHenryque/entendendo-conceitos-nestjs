@@ -16,12 +16,25 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { TestModule } from './app/test/test.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'node:path';
 
 @Module({
-  imports: [ConfigModule.forRoot(), TasksModule, UsersModule, AuthModule, TestModule],
+  imports: [
+    ConfigModule.forRoot(),
+    TasksModule,
+    UsersModule,
+    AuthModule,
+    TestModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'files'),
+      serveRoot: '/files',
+    }),
+  ],
   controllers: [AppController, TasksController, UsersController],
   providers: [
     AppService,
+
     // {
     //   provide: APP_GUARD,
     //   useClass: AuthAdminGuard,
