@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Body,
@@ -8,7 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,7 +19,7 @@ import { UpdateUserDto } from './dto/update.user.dto';
 import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
 import { TokenPayloadParam } from 'src/auth/param/token.param';
 import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { randomUUID } from 'node:crypto';
@@ -58,24 +59,34 @@ export class UsersController {
   }
 
   @UseGuards(AuthTokenGuard)
-  @UseInterceptors(FileInterceptor('file'))
+  //@UseInterceptors(FileInterceptor('file')) para 1 upload
+  @UseInterceptors(FilesInterceptor('file'))
   @Post('upload')
   async uploadAvatar(
     @TokenPayloadParam() tokenPayload: PayloadTokenDto,
-    @UploadedFile() file: Express.Multer.File,
+    //@UploadedFile() file: Express.Multer.File, para 1 upload
+    @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    //const mimeType = file.mimetype;
-    const fileExtision = path
-      .extname(file.originalname)
-      .toLocaleLowerCase()
-      .substring(1);
+    files.forEach(async (file) => {
+      const fileExtension = path
+        .extname(file.originalname)
+        .toLowerCase()
+        .substring(1);
+      const fileName = `${randomUUID()}.${fileExtension}`;
+      const fileLocale = path.resolve(process.cwd(), 'files', fileName);
 
-    // randomUUID() ou
-    const fileName = `${tokenPayload.sub}.${fileExtision}`;
+      await fs.promises.writeFile(fileLocale, file.buffer);
+    });
 
-    const fileLocale = path.resolve(process.cwd(), 'files', fileName);
-
-    await fs.promises.writeFile(fileLocale, file.buffer);
+    // //const mimeType = file.mimetype;
+    // const fileExtision = path
+    //   .extname(file.originalname)
+    //   .toLocaleLowerCase()
+    //   .substring(1);
+    // // randomUUID() ou
+    // const fileName = `${tokenPayload.sub}.${fileExtision}`;
+    // const fileLocale = path.resolve(process.cwd(), 'files', fileName);
+    // await fs.promises.writeFile(fileLocale, file.buffer);
 
     return true;
   }
