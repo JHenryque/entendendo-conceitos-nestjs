@@ -81,27 +81,6 @@ export class UsersController {
     file: Express.Multer.File, // para 1 upload
     //@UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    // files.forEach(async (file) => {
-    //   const fileExtension = path
-    //     .extname(file.originalname)
-    //     .toLowerCase()
-    //     .substring(1);
-    //   const fileName = `${randomUUID()}.${fileExtension}`;
-    //   const fileLocale = path.resolve(process.cwd(), 'files', fileName);
-
-    //   await fs.promises.writeFile(fileLocale, file.buffer);
-    // });
-
-    //const mimeType = file.mimetype;
-    const fileExtision = path
-      .extname(file.originalname)
-      .toLocaleLowerCase()
-      .substring(1);
-    // randomUUID() ou
-    const fileName = `${tokenPayload.sub}.${fileExtision}`;
-    const fileLocale = path.resolve(process.cwd(), 'files', fileName);
-    await fs.promises.writeFile(fileLocale, file.buffer);
-
-    return true;
+    return this.userService.uploadAvatarImage(tokenPayload, file);
   }
 }

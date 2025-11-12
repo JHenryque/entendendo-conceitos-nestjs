@@ -4,6 +4,9 @@ import { CreateUserDto } from './dto/create.user.dto';
 import { UpdateUserDto } from './dto/update.user.dto';
 import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
 import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
+import * as path from 'node:path';
+import * as fs from 'node:fs';
+import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class UsersService {
@@ -112,6 +115,59 @@ export class UsersService {
     } catch (err) {
       console.log(err);
       throw new HttpException('Fala ao deletar', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async uploadAvatarImage(
+    tokenPayload: PayloadTokenDto,
+    file: Express.Multer.File,
+  ) {
+    try {
+      // files.forEach(async (file) => {
+      //   const fileExtension = path
+      //     .extname(file.originalname)
+      //     .toLowerCase()
+      //     .substring(1);
+      //   const fileName = `${randomUUID()}.${fileExtension}`;
+      //   const fileLocale = path.resolve(process.cwd(), 'files', fileName);
+
+      //   await fs.promises.writeFile(fileLocale, file.buffer);
+      // });
+
+      //const mimeType = file.mimetype;
+      const fileExtision = path
+        .extname(file.originalname)
+        .toLocaleLowerCase()
+        .substring(1);
+      // randomUUID() ou
+      const fileName = `${tokenPayload.sub}.${fileExtision}`;
+      const fileLocale = path.resolve(process.cwd(), 'files', fileName);
+      await fs.promises.writeFile(fileLocale, file.buffer);
+
+      const user = await this.prisma.user.findFirst({
+        where: { id: tokenPayload.sub },
+      });
+
+      if (!user)
+        throw new HttpException('Falha ao salvar', HttpStatus.BAD_REQUEST);
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          avatar: fileName,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          avatar: true,
+        },
+      });
+
+      return fileName;
+    } catch (err) {
+      console.log(err);
+      throw new HttpException('Falha ao salvar', HttpStatus.BAD_REQUEST);
     }
   }
 }
