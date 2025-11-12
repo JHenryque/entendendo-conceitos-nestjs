@@ -5,11 +5,13 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
+  ParseFilePipeBuilder,
   ParseIntPipe,
   Patch,
   Post,
-  UploadedFiles,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -19,7 +21,7 @@ import { UpdateUserDto } from './dto/update.user.dto';
 import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
 import { TokenPayloadParam } from 'src/auth/param/token.param';
 import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { randomUUID } from 'node:crypto';
@@ -59,34 +61,46 @@ export class UsersController {
   }
 
   @UseGuards(AuthTokenGuard)
-  //@UseInterceptors(FileInterceptor('file')) para 1 upload
-  @UseInterceptors(FilesInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file')) // para 1 upload
+  // @UseInterceptors(FilesInterceptor('file'))
   @Post('upload')
   async uploadAvatar(
     @TokenPayloadParam() tokenPayload: PayloadTokenDto,
-    //@UploadedFile() file: Express.Multer.File, para 1 upload
-    @UploadedFiles() files: Array<Express.Multer.File>,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: /jpeg|jpg|png/g,
+        })
+        .addMaxSizeValidator({
+          maxSize: 5 * (1024 * 1024), // Tamanho maximo de 5MB
+        })
+        .build({
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        }),
+    )
+    file: Express.Multer.File, // para 1 upload
+    //@UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    files.forEach(async (file) => {
-      const fileExtension = path
-        .extname(file.originalname)
-        .toLowerCase()
-        .substring(1);
-      const fileName = `${randomUUID()}.${fileExtension}`;
-      const fileLocale = path.resolve(process.cwd(), 'files', fileName);
+    // files.forEach(async (file) => {
+    //   const fileExtension = path
+    //     .extname(file.originalname)
+    //     .toLowerCase()
+    //     .substring(1);
+    //   const fileName = `${randomUUID()}.${fileExtension}`;
+    //   const fileLocale = path.resolve(process.cwd(), 'files', fileName);
 
-      await fs.promises.writeFile(fileLocale, file.buffer);
-    });
+    //   await fs.promises.writeFile(fileLocale, file.buffer);
+    // });
 
-    // //const mimeType = file.mimetype;
-    // const fileExtision = path
-    //   .extname(file.originalname)
-    //   .toLocaleLowerCase()
-    //   .substring(1);
-    // // randomUUID() ou
-    // const fileName = `${tokenPayload.sub}.${fileExtision}`;
-    // const fileLocale = path.resolve(process.cwd(), 'files', fileName);
-    // await fs.promises.writeFile(fileLocale, file.buffer);
+    //const mimeType = file.mimetype;
+    const fileExtision = path
+      .extname(file.originalname)
+      .toLocaleLowerCase()
+      .substring(1);
+    // randomUUID() ou
+    const fileName = `${tokenPayload.sub}.${fileExtision}`;
+    const fileLocale = path.resolve(process.cwd(), 'files', fileName);
+    await fs.promises.writeFile(fileLocale, file.buffer);
 
     return true;
   }
