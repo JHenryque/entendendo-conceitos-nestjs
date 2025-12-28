@@ -6,7 +6,6 @@ import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
 import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
-import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class UsersService {

@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from './users.service';
 import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
 import { Test, TestingModule } from '@nestjs/testing';
+import { CreateUserDto } from './dto/create.user.dto';
 
 describe('UsersService', () => {
   let userService: UsersService;
@@ -15,11 +16,17 @@ describe('UsersService', () => {
         UsersService,
         {
           provide: PrismaService,
-          useValue: {},
+          useValue: {
+            user: {
+              create: jest.fn(),
+            },
+          },
         },
         {
           provide: HashingServiceProtocol,
-          useValue: {},
+          useValue: {
+            hash: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -37,8 +44,32 @@ describe('UsersService', () => {
     console.log(userService);
     expect(userService).toBeDefined();
   });
-  //   test.todo('deveria escrever mais testes para o user service');
-  //   test('deveria escrever um teste simples', () => {
-  //     expect(1 + 1).toBe(2);
-  //   });
+
+  it('deveria criar o user service', async () => {
+    const createUserDto: CreateUserDto = {
+      email: 'jose@gmail.com',
+      name: 'jose',
+      password: '123456',
+    };
+
+    jest.spyOn(hashingService, 'hash').mockResolvedValue('HASH_MOCK_EXEMPLO');
+
+    await userService.create(createUserDto);
+
+    //expect(hashingService.hash).toHaveBeenCalled();
+
+    expect(hashingService).toHaveBeenCalled();
+    expect(prismaService.user.create).toHaveBeenCalledWith({
+      data: {
+        name: createUserDto.name,
+        email: createUserDto.email,
+        password: 'HASH_MOCK_EXEMPLO',
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+  });
 });
