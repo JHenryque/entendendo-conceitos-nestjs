@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from './users.service';
@@ -18,7 +19,11 @@ describe('UsersService', () => {
           provide: PrismaService,
           useValue: {
             user: {
-              create: jest.fn(),
+              create: jest.fn().mockResolvedValue({
+                id: 1,
+                name: 'jose',
+                email: 'jose@gmail.com',
+              }),
             },
           },
         },
@@ -54,7 +59,7 @@ describe('UsersService', () => {
 
     jest.spyOn(hashingService, 'hash').mockResolvedValue('HASH_MOCK_EXEMPLO');
 
-    await userService.create(createUserDto);
+    const result = await userService.create(createUserDto);
 
     //expect(hashingService.hash).toHaveBeenCalled();
 
@@ -70,6 +75,12 @@ describe('UsersService', () => {
         name: true,
         email: true,
       },
+    });
+
+    expect(result).toEqual({
+      id: 1,
+      name: 'jose',
+      email: 'jose@gmail.com',
     });
   });
 });
